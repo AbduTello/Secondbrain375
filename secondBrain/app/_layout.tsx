@@ -9,6 +9,9 @@ export default function RootLayout() {
     <Stack.Screen name='addTask' options={{
       headerTitle: " Add Task",
     }} />
+    <Stack.Screen name='calendar' options={{
+      headerTitle: " Calendar",
+    }} />
   </Stack>
 );
 }
