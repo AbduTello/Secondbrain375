@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { Text, View, StyleSheet } from "react-native";
 
-export default function Index() {
+export default function addTask() {
   return (
     <View
       style={{
@@ -10,23 +10,19 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Hello expo</Text>
-      
-      <Link href={"/addTask"} style={styles.button}>
-      Add Task
-      </Link>
-      
+      <Text>Add task</Text>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
 
-button: {
-
-fontSize: 20,
-textDecorationLine: "underline",
-color: "#1e1e1e"
-},
-
-})
+    button: {
+    
+    fontSize: 20,
+    textDecorationLine: "underline",
+    color: "#1e1e1e"
+    },
+    
+    })
