@@ -5,9 +5,10 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Button,
   ScrollView,
+  Platform,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { firestore } from "../../firebaseConfig";
 
@@ -16,8 +17,10 @@ export default function AddTask() {
   const [description, setDescription] = useState<string>("");
   const [category, setCategory] = useState<string>("School");
   const [priority, setPriority] = useState<string>("!");
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [endDate, setEndDate] = useState<Date | null>(new Date());
+  const [showStartPicker, setShowStartPicker] = useState<boolean>(false);
+  const [showEndPicker, setShowEndPicker] = useState<boolean>(false);
 
   const categories = ["School", "Work", "Gym", "Personal", "Hobbies", "Social"];
   const priorities = ["!", "!!", "!!!"];
@@ -39,6 +42,18 @@ export default function AddTask() {
     }
   };
 
+  const handleDateChange = (
+    event: any,
+    selectedDate: Date | undefined,
+    setDate: React.Dispatch<React.SetStateAction<Date | null>>,
+    togglePicker: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+    togglePicker(false);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -46,13 +61,41 @@ export default function AddTask() {
       </View>
 
       <View style={styles.dateRow}>
-        <TouchableOpacity style={styles.dateInput}>
-          <Text>{startDate ? startDate.toDateString() : "Start Date"}</Text>
+        <TouchableOpacity
+          style={styles.dateInput}
+          onPress={() => setShowStartPicker(true)}
+        >
+          <Text>{startDate ? startDate.toLocaleString() : "Start Date"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInput}>
-          <Text>{endDate ? endDate.toDateString() : "End Date"}</Text>
+        <TouchableOpacity
+          style={styles.dateInput}
+          onPress={() => setShowEndPicker(true)}
+        >
+          <Text>{endDate ? endDate.toLocaleString() : "End Date"}</Text>
         </TouchableOpacity>
       </View>
+
+      {showStartPicker && (
+        <DateTimePicker
+          value={startDate || new Date()}
+          mode="datetime"
+          display={Platform.OS === "ios" ? "inline" : "default"}
+          onChange={(event, selectedDate) =>
+            handleDateChange(event, selectedDate, setStartDate, setShowStartPicker)
+          }
+        />
+      )}
+
+      {showEndPicker && (
+        <DateTimePicker
+          value={endDate || new Date()}
+          mode="datetime"
+          display={Platform.OS === "ios" ? "inline" : "default"}
+          onChange={(event, selectedDate) =>
+            handleDateChange(event, selectedDate, setEndDate, setShowEndPicker)
+          }
+        />
+      )}
 
       <Text style={styles.label}>Title</Text>
       <TextInput
@@ -120,7 +163,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -175,19 +217,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#006ee9",
   },
   categoryText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  addCategoryButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    backgroundColor: "#7BB662",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addCategoryText: {
-    fontSize: 18,
     color: "#fff",
     fontWeight: "bold",
   },
