@@ -14,19 +14,14 @@ type Task = {
   completed: boolean;
 };
 
-// Define a type for the day object returned by react-native-calendars
 type DayObject = {
   dateString: string; // e.g., "2024-12-08"
-  day: number; // e.g., 8
-  month: number; // e.g., 12
-  year: number; // e.g., 2024
-  timestamp: number; // e.g., Unix timestamp
 };
 
 export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split('T')[0]
-  ); // Initialize with today's date
+  ); // Today's date in YYYY-MM-DD format
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -34,12 +29,34 @@ export default function CalendarPage() {
     const fetchTasks = async () => {
       setLoading(true);
       try {
+        // Parse selectedDate as local time
+        const selectedDateLocal = new Date(selectedDate); // Local time
+        console.log("Selected Date (Local):", selectedDateLocal);
+  
+        // Calculate start and end of the day explicitly in UTC
+        const startOfDayUTC = new Date(
+          selectedDateLocal.getUTCFullYear(),
+          selectedDateLocal.getUTCMonth(),
+          selectedDateLocal.getUTCDate(),
+          0, 0, 0 // Midnight UTC
+        );
+        const endOfDayUTC = new Date(
+          selectedDateLocal.getUTCFullYear(),
+          selectedDateLocal.getUTCMonth(),
+          selectedDateLocal.getUTCDate(),
+          23, 59, 59, 999 // End of day UTC
+        );
+  
+        console.log("Start of Day (UTC):", startOfDayUTC.toISOString());
+        console.log("End of Day (UTC):", endOfDayUTC.toISOString());
+  
+        // Firestore query using the calculated UTC boundaries
         const q = query(
           collection(firestore, 'tasks'),
-          where('startDate', '>=', new Date(selectedDate)),
-          where('startDate', '<', new Date(new Date(selectedDate).getTime() + 24 * 60 * 60 * 1000))
+          where('startDate', '>=', startOfDayUTC),
+          where('startDate', '<=', endOfDayUTC)
         );
-
+  
         const querySnapshot = await getDocs(q);
         const taskList: Task[] = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -50,17 +67,20 @@ export default function CalendarPage() {
           priority: doc.data().priority,
           completed: doc.data().completed,
         }));
-
+  
+        console.log("Fetched Tasks:", taskList);
         setTasks(taskList);
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        console.error("Error fetching tasks:", error);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchTasks();
   }, [selectedDate]);
+  
+  
 
   const getPriorityColor = (priority: string): string => {
     switch (priority) {
@@ -93,7 +113,7 @@ export default function CalendarPage() {
   return (
     <View style={styles.container}>
       <Calendar
-        onDayPress={(day: DayObject) => setSelectedDate(day.dateString)} // Explicit type added
+        onDayPress={(day: DayObject) => setSelectedDate(day.dateString)}
         markedDates={{
           [selectedDate]: { selected: true, marked: true, selectedColor: '#006ee9' },
         }}
@@ -164,10 +184,10 @@ const styles = StyleSheet.create({
   },
   noTasksText: {
     color: '#fff',
-    textAlign: 'center', // Optional for alignment
-    marginTop: 10, // Optional for spacing
-    fontWeight: 500,
+    textAlign: 'center',
+    marginTop: 10,
+    fontWeight: '500',
     fontSize: 16,
   },
-  
 });
+

@@ -119,6 +119,7 @@ export default function DisplayTasks() {
     />
   );
 }
+
 const styles = StyleSheet.create({
   taskItem: {
     flexDirection: 'row',
@@ -170,6 +171,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-})
-
-
+});
