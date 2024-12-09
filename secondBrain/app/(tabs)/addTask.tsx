@@ -54,6 +54,22 @@ export default function AddTask() {
     togglePicker(false);
   };
 
+  const getPriorityButtonStyle = (prio: string) => {
+    if (priority === prio) {
+      switch (prio) {
+        case "!":
+          return { backgroundColor: "#28a745" }; // Green
+        case "!!":
+          return { backgroundColor: "#ffc107" }; // Yellow
+        case "!!!":
+          return { backgroundColor: "#dc3545" }; // Red
+        default:
+          return {};
+      }
+    }
+    return { backgroundColor: "#ddd" }; // Default
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -126,10 +142,7 @@ export default function AddTask() {
         {priorities.map((prio) => (
           <TouchableOpacity
             key={prio}
-            style={[
-              styles.priorityButton,
-              priority === prio && styles.selectedPriority,
-            ]}
+            style={[styles.priorityButton, getPriorityButtonStyle(prio)]}
             onPress={() => setPriority(prio)}
           >
             <Text style={styles.priorityText}>{prio}</Text>
@@ -224,12 +237,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 20,
-    backgroundColor: "#ddd",
     marginRight: 10,
     marginBottom: 10,
-  },
-  selectedPriority: {
-    backgroundColor: "#28a745",
   },
   priorityText: {
     color: "#fff",
@@ -248,3 +257,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
