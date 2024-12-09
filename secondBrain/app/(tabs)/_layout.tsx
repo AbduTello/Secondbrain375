@@ -10,6 +10,7 @@ export default function TabsLayout() {
   >
     <Tabs.Screen name='index' options={{
       headerTitle: " Tasks",
+      tabBarLabel: "Tasks",
       tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "checkmark-circle-sharp" : "checkmark-circle-outline"}
       color={"#006EE9"}
       size={25} />
